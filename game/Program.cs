@@ -16,6 +16,7 @@ namespace game
         static Vector2[] squares = new Vector2[50]; 
         static int squareSize = 10;
         static int score = 0; 
+        static int highScore = 0; 
 
         static void Main(string[] args)
         {
@@ -53,12 +54,34 @@ namespace game
             }
         }
 
+        static void ResetGame()
+        {
+            position = new Vector2(Raylib.GetScreenWidth(), Raylib.GetScreenHeight()) / 2;
+            velocity = Vector2.Zero;
+            jumpCount = 5;
+            isGameOver = false;
+            score = 0;
+
+            for (int i = 0; i < squares.Length; i++)
+            {
+                squares[i] = new Vector2(Raylib.GetRandomValue(0, Raylib.GetScreenWidth() - squareSize), Raylib.GetRandomValue(0, Raylib.GetScreenHeight() - squareSize));
+            }
+        }
+
         static void Update()
         {
             if (isGameOver)
             {
                 Raylib.DrawText("Game Over", 300, 200, 45, Color.Black);
-                Raylib.DrawText($"Final Score: {score}", 300, 250, 30, Color.Black);
+                Raylib.DrawText($"Final Score: {score}", 300, 250, 30, Color.Black); 
+                Raylib.DrawText($"High Score: {highScore}", 300, 300, 30, Color.Black); 
+                Raylib.DrawText("Press Enter to Restart", 300, 350, 20, Color.Black); 
+
+                if (Raylib.IsKeyPressed(KeyboardKey.Enter))
+                {
+                    ResetGame();
+                }
+
                 return;
             }
 
@@ -81,6 +104,11 @@ namespace game
                 if (jumpCount <= 0)
                 {
                     isGameOver = true;
+            
+                    if (score > highScore)
+                    {
+                        highScore = score;
+                    }
                 }
             }
 
@@ -106,7 +134,7 @@ namespace game
                 if (Raylib.CheckCollisionCircles(position, radius, squares[i] + new Vector2(squareSize / 2, squareSize / 2), squareSize / 2))
                 {
                     squares[i] = new Vector2(-1, -1); 
-                    score++; 
+                    score++;
                 }
             }
 
