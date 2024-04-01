@@ -10,6 +10,8 @@ namespace game
         static Vector2 gravity;
         static Color color;
         static int radius;
+        static int jumpCount = 5; 
+        static bool isGameOver = false;
 
         static void Main(string[] args)
         {
@@ -44,7 +46,12 @@ namespace game
 
         static void Update()
         {
-            
+            if (isGameOver)
+            {
+                Raylib.DrawText("Game Over", 300, 200, 45, Color.Black);
+                return; // End the game
+            }
+
             if (Raylib.IsKeyDown(KeyboardKey.Right))
                 velocity.X += 30;
             if (Raylib.IsKeyDown(KeyboardKey.Left))
@@ -55,14 +62,23 @@ namespace game
             position += velocity * Raylib.GetFrameTime();
 
             bool isOnGround = position.Y + radius >= Raylib.GetScreenHeight();
+            
             if (isOnGround)
             {
                 position.Y = Raylib.GetScreenHeight() - radius;
                 velocity.Y = 0;
+                
+                if (jumpCount <= 0) 
+                {
+                    isGameOver = true;
+                }
             }
 
-            if (Raylib.IsKeyPressed(KeyboardKey.Up) && isOnGround)
+            if (Raylib.IsKeyPressed(KeyboardKey.Up) && isOnGround && jumpCount > 0)
+            {
                 velocity.Y = -900;
+                jumpCount--; 
+            }
 
             if (position.X < 0 + radius)
             {
@@ -74,9 +90,11 @@ namespace game
                 position.X = Raylib.GetScreenWidth() - radius;
                 velocity.X = 0;
             }
+         
+            Raylib.DrawText($"Jumps left: {jumpCount}", 10, 10, 20, Color.Black);
 
-            // Draw the ball
             Raylib.DrawCircleV(position, radius, color);
         }
     }
 }
+
