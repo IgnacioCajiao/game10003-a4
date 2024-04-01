@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using System.Numerics;
+
 namespace game
 {
     internal class BallGame
@@ -10,8 +11,10 @@ namespace game
         static Vector2 gravity;
         static Color color;
         static int radius;
-        static int jumpCount = 5; 
+        static int jumpCount = 5;
         static bool isGameOver = false;
+        static Vector2[] squares = new Vector2[50];
+        static int squareSize = 10;
 
         static void Main(string[] args)
         {
@@ -42,6 +45,11 @@ namespace game
             radius = 25;
 
             gravity = new Vector2(0, +800);
+
+            for (int i = 0; i < squares.Length; i++)
+            {
+                squares[i] = new Vector2(Raylib.GetRandomValue(0, Raylib.GetScreenWidth() - squareSize), Raylib.GetRandomValue(0, Raylib.GetScreenHeight() - squareSize));
+            }
         }
 
         static void Update()
@@ -49,7 +57,7 @@ namespace game
             if (isGameOver)
             {
                 Raylib.DrawText("Game Over", 300, 200, 45, Color.Black);
-                return; // End the game
+                return;
             }
 
             if (Raylib.IsKeyDown(KeyboardKey.Right))
@@ -62,13 +70,13 @@ namespace game
             position += velocity * Raylib.GetFrameTime();
 
             bool isOnGround = position.Y + radius >= Raylib.GetScreenHeight();
-            
+
             if (isOnGround)
             {
                 position.Y = Raylib.GetScreenHeight() - radius;
                 velocity.Y = 0;
-                
-                if (jumpCount <= 0) 
+
+                if (jumpCount <= 0)
                 {
                     isGameOver = true;
                 }
@@ -77,7 +85,7 @@ namespace game
             if (Raylib.IsKeyPressed(KeyboardKey.Up) && isOnGround && jumpCount > 0)
             {
                 velocity.Y = -900;
-                jumpCount--; 
+                jumpCount--;
             }
 
             if (position.X < 0 + radius)
@@ -90,11 +98,26 @@ namespace game
                 position.X = Raylib.GetScreenWidth() - radius;
                 velocity.X = 0;
             }
-         
+
+            for (int i = 0; i < squares.Length; i++)
+            {
+                if (Raylib.CheckCollisionCircles(position, radius, squares[i] + new Vector2(squareSize / 2, squareSize / 2), squareSize / 2))
+                {
+                    squares[i] = new Vector2(-1, -1); 
+                }
+            }
+
             Raylib.DrawText($"Jumps left: {jumpCount}", 10, 10, 20, Color.Black);
+
+            foreach (Vector2 square in squares)
+            {
+                if (square.X >= 0 && square.Y >= 0) 
+                {
+                    Raylib.DrawRectangleV(square, new Vector2(squareSize, squareSize), Color.Blue);
+                }
+            }
 
             Raylib.DrawCircleV(position, radius, color);
         }
     }
 }
-
