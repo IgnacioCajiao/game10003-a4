@@ -13,8 +13,9 @@ namespace game
         static int radius;
         static int jumpCount = 5;
         static bool isGameOver = false;
-        static Vector2[] squares = new Vector2[50];
+        static Vector2[] squares = new Vector2[50]; 
         static int squareSize = 10;
+        static int score = 0; 
 
         static void Main(string[] args)
         {
@@ -57,6 +58,7 @@ namespace game
             if (isGameOver)
             {
                 Raylib.DrawText("Game Over", 300, 200, 45, Color.Black);
+                Raylib.DrawText($"Final Score: {score}", 300, 250, 30, Color.Black);
                 return;
             }
 
@@ -104,10 +106,12 @@ namespace game
                 if (Raylib.CheckCollisionCircles(position, radius, squares[i] + new Vector2(squareSize / 2, squareSize / 2), squareSize / 2))
                 {
                     squares[i] = new Vector2(-1, -1); 
+                    score++; 
                 }
             }
 
             Raylib.DrawText($"Jumps left: {jumpCount}", 10, 10, 20, Color.Black);
+            Raylib.DrawText($"Score: {score}", 10, 30, 20, Color.Black); 
 
             foreach (Vector2 square in squares)
             {
